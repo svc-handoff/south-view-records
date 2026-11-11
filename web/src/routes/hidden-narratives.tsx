@@ -9,6 +9,8 @@ export const HIDDEN_NARRATIVES_PATH = "/hidden-narratives";
 const linkClass =
   "font-medium text-foreground underline underline-offset-4 rounded-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50";
 
+const COALITION_URL = "https://1906atlantaracemassacre.org/";
+
 /** How the ledgers bring overlooked lives to light, with the 1906 Atlanta Race Massacre as a case study. */
 export function HiddenNarrativesPage() {
   usePageTitle("Hidden Narratives");
@@ -20,9 +22,7 @@ export function HiddenNarrativesPage() {
           Hidden Narratives
         </h1>
         <p className="text-lg leading-relaxed">
-          Cemetery ledgers record people that newspapers and official histories often left out. Each line holds a name, a
-          burial date, an age, and a grave. Once these handwritten pages can be searched, those lines can be connected to
-          the events around them, and the people in them can be found again.
+          Cemetery ledgers often contain hidden insights that can lead us to better understanding stories and historical events. The dates, locations, and names of individuals buried during certain time periods can provide these insights.
         </p>
       </header>
 
@@ -31,13 +31,12 @@ export function HiddenNarrativesPage() {
           Case study: the 1906 Atlanta Race Massacre
         </h2>
         <p className="leading-relaxed">
-          Beginning on September 22, 1906, white mobs attacked Black people across Atlanta for several days, after local
-          newspapers ran sensational, unproven reports of assaults on white women. Official counts listed about two dozen
-          Black people killed. Many historians believe the true number was higher, and many of the dead were never named.
+          In late September 1906, the Atlanta Race Massacre occurred. Throughout four days, white mobs killed at least twenty-five Black Atlantans.
+          False and sensational news reports detailing assaults on white women from white newspapers, radicalized the mob leading to this race-driven attack{" "}
+          <Cite href={COALITION_URL}>Coalition to Remember</Cite>.
         </p>
         <p className="leading-relaxed">
-          George Wilder was one of the victims. The South-View ledger records his burial on September 24, 1906, at the age
-          of 60.
+          George Wilder was one of the victims. The South-View Records Index project found his name in the ledger and detailed information below.
         </p>
 
         <Figure
@@ -47,7 +46,7 @@ export function HiddenNarrativesPage() {
             <a href={ledger} className="block rounded-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50">
               <img
                 src={ledger}
-                alt="A handwritten ledger page. The top line reads “Geo Wilder,” followed by the numbers 24, 60, and 88, the letter B, and the plat MS."
+                alt="Handwritten ledger page. The top line is “Geo Wilder,” followed by the numbers 24, 60, and 88, the letter B, and the plat MS."
                 className="w-full border border-border"
               />
             </a>
@@ -68,8 +67,8 @@ export function HiddenNarrativesPage() {
             />
           }
         >
-          The same line as it appears on this site, kept exactly as written. The highlights show what was hard to read,
-          including his name, so a search for a different spelling will still find him.
+          The highlights show what was hard to read in our automated process,
+          including his name, so a search for a different or similar spelling will still be picked up.
         </Figure>
 
         <p className="flex flex-col gap-2 sm:flex-row sm:gap-6">
@@ -82,11 +81,33 @@ export function HiddenNarrativesPage() {
         </p>
       </section>
 
-      <p className="leading-relaxed text-muted-foreground">
-        Not every name in these ledgers comes with a story we already know. Making the pages searchable is a first step
-        toward finding them.
-      </p>
+      <section aria-labelledby="sources" className="flex flex-col gap-3 border-t border-border pt-6">
+        <h2 id="sources" className="font-heading text-xl font-semibold text-foreground">
+          Sources
+        </h2>
+        <ul className="flex flex-col gap-2 text-sm leading-relaxed">
+          <li>
+            Coalition to Remember the 1906 Atlanta Race Massacre, The 1906 Atlanta Race Massacre, 1906atlantaracemassacre.org,{" "}
+            <a href={COALITION_URL} className={linkClass}>
+              {COALITION_URL}
+            </a>
+          </li>
+        </ul>
+      </section>
     </article>
+  );
+}
+
+/** A short in-text citation, e.g. "(Coalition to Remember)", linking to the source. */
+function Cite({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <>
+      (
+      <a href={href} className={linkClass}>
+        {children}
+      </a>
+      )
+    </>
   );
 }
 

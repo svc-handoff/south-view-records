@@ -14,28 +14,21 @@ export function MethodsPage() {
       </h1>
 
       <Section title="Scanning the ledgers">
-        We scanned the ledgers and split each two-page spread into single pages, cropping carefully so no columns were
-        cut off and the writing near the binding was kept. We also made grayscale and simplified-color copies of each
-        page to help with faded handwriting, and kept the original color scans.
+        The ledgers that were scanned by the GT Library were split into single pages from two-page spreads and cropped accordingly.
+        This allowed us to maximize accuracy and use AI for the automated transcription process.
       </Section>
 
       <Section title="Reading the handwriting">
-        An AI model that can read images transcribed each page, zooming in on hard-to-read parts. It was given detailed
-        instructions about how the ledger is laid out and what each column means, plus a few examples from records we’d
-        already transcribed. Names and values are kept exactly as written, in the same order as the page. Anything it
-        couldn’t read clearly, couldn’t read at all, or had to work out is marked, and those marks are the highlighted
-        “uncertain” values you’ll see on the site.
+       A large language model (LLM) and subagents were used to transcribe pages. The LLM zoomed in on hard-to-read parts to improve accuracy.
+        The agents were given instructions about the layout of the ledgers as well as examples on how to fill out the transcriptions.
+        If the agent had uncertainty, that was marked and documented and visible on the site.
+
       </Section>
 
-      <Section title="Checking the results">
-        We combined all the pages and checked them for consistency. We only made small, careful fixes, like filling a gap
-        the ledger itself supports or tidying formatting, and logged every change. Where something was truly unclear, we
-        left it unclear rather than guess.
-      </Section>
+
 
       <Section title="A note on accuracy">
-        These are AI-assisted transcriptions, not a verified reading of the original ledgers. They’re a good place to
-        start, but if a record matters to you, it’s worth checking against the ledger itself.
+        All of these transcriptions were done with an LLM, so there may be accuracy issues. Follow the uncertainty markings when you want to determine the model's confidence.
       </Section>
     </article>
   );
