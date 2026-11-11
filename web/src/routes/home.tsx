@@ -29,7 +29,7 @@ export function HomePage() {
             Find a burial record
           </h1>
           <p className="mx-auto max-w-xl text-base text-muted-foreground sm:text-lg">
-            Search transcriptions of South-View Cemetery’s handwritten grave record ledgers, 1905–1918. Every name is
+            Search transcriptions of South-View Cemetery’s handwritten grave record ledgers, 1905–1937. Every name is
             shown exactly as the clerk wrote it.
           </p>
         </div>

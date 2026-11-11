@@ -22,7 +22,7 @@ export const MONTHS = [
  * Years the ledgers cover. Records dated outside them are likely misreadings, so the site
  * leaves them out. Keep in sync with the backend's src/data/burials.ts.
  */
-export const LEDGER_YEARS = { first: 1905, last: 1918 } as const;
+export const LEDGER_YEARS = { first: 1905, last: 1937 } as const;
 
 export type DateBound = "from" | "to";
 export type DateParts = { year: string; month: string; day: string };

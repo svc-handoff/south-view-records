@@ -200,15 +200,15 @@ describe("records dated outside the ledger years", () => {
     const repository = await loadBurials();
     const { id: _, ...hattie } = (await repository.getById(10))!;
     const early = await repository.create({ ...hattie, lineOnPage: 90, burialDate: "1890-05-01" });
-    await repository.create({ ...hattie, lineOnPage: 91, burialDate: "1925-05-01" });
-    await repository.create({ ...hattie, lineOnPage: 92, burialDate: "1918-12-31" });
+    await repository.create({ ...hattie, lineOnPage: 91, burialDate: "1940-05-01" });
+    await repository.create({ ...hattie, lineOnPage: 92, burialDate: "1937-12-31" });
     const routes = burialRoutes(repository);
 
     const result: SearchResult = await (await routes.request("/burials?q=tolbert")).json();
-    expect(result.items.map((item) => item.burialDate)).toEqual(["1905-10-12", "1918-12-31"]);
+    expect(result.items.map((item) => item.burialDate)).toEqual(["1905-10-12", "1937-12-31"]);
     expect((await routes.request(`/burials/${early.id}`)).status).toBe(404);
     const stats: Stats = await (await routes.request("/stats")).json();
-    expect(stats).toMatchObject({ total: 84, earliestDate: "1905-10-10", latestDate: "1918-12-31" });
+    expect(stats).toMatchObject({ total: 84, earliestDate: "1905-10-10", latestDate: "1937-12-31" });
   });
 });
 

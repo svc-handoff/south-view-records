@@ -15,7 +15,7 @@ export async function loadBurials(dir = process.env.BURIALS_DATA_DIR ?? DEFAULT_
  * Years the ledgers cover. Records dated outside them are likely misreadings, so searches,
  * record pages, and stats leave them out, on the public site and the admin page; undated records are shown. Keep in sync with web/src/lib/filters.ts.
  */
-export const LEDGER_YEARS = { first: 1905, last: 1918 } as const;
+export const LEDGER_YEARS = { first: 1905, last: 1937 } as const;
 
 export function inLedgerYears(burial: Pick<Burial, "burialDate">): boolean {
   if (!burial.burialDate) return true;

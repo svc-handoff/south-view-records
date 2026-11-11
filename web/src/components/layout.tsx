@@ -40,7 +40,7 @@ export function Layout() {
         <Outlet />
       </main>
       <footer className="border-t border-border px-4 py-6 text-center text-sm text-muted-foreground">
-        Transcribed from the South-View Cemetery grave record ledgers, 1905–1918. Names and values are shown exactly
+        Transcribed from the South-View Cemetery grave record ledgers, 1905–1937. Names and values are shown exactly
         as written.
       </footer>
       <ScrollRestoration />
