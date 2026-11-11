@@ -52,8 +52,8 @@ export function HiddenNarrativesPage() {
             </a>
           }
         >
-          “Geo Wilder” on the top line of ledger page 31. The clerk wrote the day of the burial (24), his age (60), and
-          where in the cemetery he was laid to rest. Select the image to see it larger.
+          “Geo Wilder” is on the top line of the ledger, page 31. The record contains the day of the burial (24), his age (60), and
+          his cemetery location. Select the image to view it larger.
         </Figure>
 
         <Figure
