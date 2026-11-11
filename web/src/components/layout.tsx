@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Link, Outlet, ScrollRestoration, useLocation } from "react-router";
 import mark from "@/assets/south-view-mark.png";
+import { HIDDEN_NARRATIVES_PATH } from "@/routes/hidden-narratives";
 import { METHODS_PATH } from "@/routes/methods";
 
 const focusRing = "rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50";
@@ -30,7 +31,7 @@ export function Layout() {
       {pathname === "/" ? (
         // The home page shows its own large logo, so it only needs the link.
         <nav aria-label="Site" className="mx-auto flex w-full max-w-3xl justify-end px-4 pt-3 sm:px-6">
-          <MethodsLink />
+          <SiteLinks />
         </nav>
       ) : (
         <SiteHeader />
@@ -50,7 +51,7 @@ export function Layout() {
 function SiteHeader() {
   return (
     <header className="border-b border-border">
-      <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+      <div className="mx-auto flex w-full max-w-3xl flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-3 sm:px-6">
         <Link to="/" className={`flex items-center gap-3 ${focusRing}`}>
           <img src={mark} alt="" className="h-8 w-auto" />
           <span className="flex flex-col leading-none">
@@ -61,17 +62,28 @@ function SiteHeader() {
           </span>
         </Link>
         <nav aria-label="Site">
-          <MethodsLink />
+          <SiteLinks />
         </nav>
       </div>
     </header>
   );
 }
 
-function MethodsLink() {
+const SITE_LINKS = [
+  [HIDDEN_NARRATIVES_PATH, "Hidden Narratives"],
+  [METHODS_PATH, "Methods"],
+] as const;
+
+function SiteLinks() {
   return (
-    <Link to={METHODS_PATH} className={`py-2 font-medium text-foreground underline underline-offset-4 ${focusRing}`}>
-      Methods
-    </Link>
+    <ul className="flex flex-wrap gap-x-5">
+      {SITE_LINKS.map(([path, label]) => (
+        <li key={path}>
+          <Link to={path} className={`inline-block py-2 font-medium text-foreground underline underline-offset-4 ${focusRing}`}>
+            {label}
+          </Link>
+        </li>
+      ))}
+    </ul>
   );
 }

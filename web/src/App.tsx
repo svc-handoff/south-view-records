@@ -3,6 +3,7 @@ import { createBrowserRouter, Link, RouterProvider } from "react-router";
 import { Layout } from "@/components/layout";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { ADMIN_PATH, AdminPage } from "@/routes/admin";
+import { HIDDEN_NARRATIVES_PATH, HiddenNarrativesPage } from "@/routes/hidden-narratives";
 import { HomePage } from "@/routes/home";
 import { METHODS_PATH, MethodsPage } from "@/routes/methods";
 import { RecordPage } from "@/routes/record";
@@ -20,6 +21,7 @@ const router = createBrowserRouter([
       { path: "search", element: <SearchPage /> },
       { path: "records/:id", element: <RecordPage /> },
       { path: METHODS_PATH, element: <MethodsPage /> },
+      { path: HIDDEN_NARRATIVES_PATH, element: <HiddenNarrativesPage /> },
       { path: ADMIN_PATH, element: <AdminPage /> },
       { path: "*", element: <NotFound /> },
     ],
