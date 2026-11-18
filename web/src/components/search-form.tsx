@@ -1,11 +1,11 @@
 import { useId, useRef, useState, type FormEvent } from "react";
-import { flushSync } from "react-dom";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronDownIcon, SearchIcon, SlidersHorizontalIcon } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router";
+import { DatePicker } from "@/components/date-picker";
 import { Button } from "@/components/ui/button";
 import { getStats } from "@/lib/api";
-import { FILTERS, MONTHS, readFilters, splitDate, type DateBound } from "@/lib/filters";
+import { FILTERS, isoToDate, readFilters } from "@/lib/filters";
 import { formatDate } from "@/lib/format";
 import { UNCERTAINTY_KINDS } from "@/lib/uncertainty";
 import { cn } from "@/lib/utils";
@@ -35,7 +35,9 @@ export function SearchForm({
   const [query, setQuery] = useState(params.get("q") ?? "");
   const activeCount = FILTERS.filter((name) => params.get(name)).length;
   const [open, setOpen] = useState(activeCount > 0);
-  const [errors, setErrors] = useState<Partial<Record<DateBound, string>>>({});
+  const [from, setFrom] = useState(() => isoToDate(params.get("from")));
+  const [to, setTo] = useState(() => isoToDate(params.get("to")));
+  const [undated, setUndated] = useState(Boolean(params.get("undated")));
   const panelRef = useRef<HTMLDivElement>(null);
   const stats = useQuery({ queryKey: ["stats"], queryFn: getStats });
   const large = size === "large";
@@ -43,18 +45,7 @@ export function SearchForm({
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const { values, errors: found } = readFilters(new FormData(event.currentTarget));
-    const firstError = (["from", "to"] as const).find((bound) => found[bound]);
-    if (firstError) {
-      // Show the panel before moving focus to the date that needs fixing.
-      flushSync(() => {
-        setErrors(found);
-        setOpen(true);
-      });
-      document.getElementById(field(`${firstError}Month`))?.focus();
-      return;
-    }
-    setErrors({});
+    const values = readFilters(new FormData(event.currentTarget));
     const next = new URLSearchParams();
     if (query.trim()) next.set("q", query.trim());
     for (const [name, value] of Object.entries(values)) next.set(name, value);
@@ -66,7 +57,9 @@ export function SearchForm({
       if (element instanceof HTMLInputElement && element.type === "checkbox") element.checked = false;
       else element.value = "";
     });
-    setErrors({});
+    setFrom(null);
+    setTo(null);
+    setUndated(false);
     if (activeCount > 0) navigate(`${path}?${new URLSearchParams(query.trim() ? { q: query.trim() } : {})}`);
   };
 
@@ -142,19 +135,36 @@ export function SearchForm({
             {stats.data?.earliestDate && stats.data.latestDate
               ? `Records so far run from ${formatDate(stats.data.earliestDate)} to ${formatDate(stats.data.latestDate)}. `
               : null}
-            Fill in just a year, or a month and year, to cover the whole period. Records with no date are left out of a
-            date search.
+            Pick a start date, an end date, or both. Records with no date are left out of a date search.
           </p>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <DateField bound="from" label="From" field={field} error={errors.from} defaultIso={params.get("from")} />
-            <DateField bound="to" label="To" field={field} error={errors.to} defaultIso={params.get("to")} />
+            <DatePicker
+              id={field("from")}
+              name="from"
+              label="From"
+              value={from}
+              onChange={setFrom}
+              max={to ?? undefined}
+              disabled={undated}
+            />
+            <DatePicker
+              id={field("to")}
+              name="to"
+              label="To"
+              value={to}
+              onChange={setTo}
+              min={from ?? undefined}
+              defaultMonth={from ?? undefined}
+              disabled={undated}
+            />
           </div>
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
               name="undated"
               value="yes"
-              defaultChecked={Boolean(params.get("undated"))}
+              checked={undated}
+              onChange={(event) => setUndated(event.target.checked)}
               className="size-5 accent-primary"
             />
             Only records with no date recorded
@@ -226,90 +236,5 @@ export function SearchForm({
         </div>
       </div>
     </form>
-  );
-}
-
-/** Month, day, and year typed separately instead of the browser's date picker. */
-function DateField({
-  bound,
-  label,
-  field,
-  error,
-  defaultIso,
-}: {
-  bound: DateBound;
-  label: string;
-  field: (name: string) => string;
-  error: string | undefined;
-  defaultIso: string | null;
-}) {
-  const parts = splitDate(defaultIso);
-  const errorId = field(`${bound}Error`);
-  const invalid = error ? true : undefined;
-  const describedBy = error ? errorId : undefined;
-
-  return (
-    <fieldset className="flex flex-col gap-1">
-      <legend className="mb-1 text-sm font-medium">{label}</legend>
-      <div className="grid grid-cols-[1fr_4.5rem_5.5rem] gap-2">
-        <div className="flex flex-col gap-1">
-          <label htmlFor={field(`${bound}Month`)} className="text-sm text-muted-foreground">
-            Month
-          </label>
-          <select
-            id={field(`${bound}Month`)}
-            name={`${bound}Month`}
-            defaultValue={parts.month}
-            aria-invalid={invalid}
-            aria-describedby={describedBy}
-            className={inputClass}
-          >
-            <option value="">Any</option>
-            {MONTHS.map((month, index) => (
-              <option key={month} value={String(index + 1)}>
-                {month}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="flex flex-col gap-1">
-          <label htmlFor={field(`${bound}Day`)} className="text-sm text-muted-foreground">
-            Day
-          </label>
-          <input
-            id={field(`${bound}Day`)}
-            name={`${bound}Day`}
-            inputMode="numeric"
-            maxLength={2}
-            autoComplete="off"
-            defaultValue={parts.day}
-            aria-invalid={invalid}
-            aria-describedby={describedBy}
-            className={inputClass}
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label htmlFor={field(`${bound}Year`)} className="text-sm text-muted-foreground">
-            Year
-          </label>
-          <input
-            id={field(`${bound}Year`)}
-            name={`${bound}Year`}
-            inputMode="numeric"
-            maxLength={4}
-            autoComplete="off"
-            defaultValue={parts.year}
-            aria-invalid={invalid}
-            aria-describedby={describedBy}
-            className={inputClass}
-          />
-        </div>
-      </div>
-      {error ? (
-        <p id={errorId} className="text-sm font-medium text-destructive">
-          {error}
-        </p>
-      ) : null}
-    </fieldset>
   );
 }

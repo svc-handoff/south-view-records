@@ -1,6 +1,6 @@
 import path from "node:path";
 import { loadBurialDirectory } from "./load.js";
-import { matchName, type NameMatch } from "./match.js";
+import { matchName, nameDistance, type NameMatch } from "./match.js";
 import { matchesUncertainty } from "./uncertainty.js";
 import type { Burial, BurialHit, BurialInput, BurialRepository, SearchParams, SearchResult, Stats } from "./types.js";
 
@@ -23,9 +23,10 @@ export function inLedgerYears(burial: Pick<Burial, "burialDate">): boolean {
   return year >= LEDGER_YEARS.first && year <= LEDGER_YEARS.last;
 }
 
-const MATCH_RANK = { exact: 0, abbreviation: 1, fuzzy: 2 } as const;
-
-/** Ledger reading order: by burial date (undated last), then page and line. */
+/**
+ * Ledger reading order: by burial date, earliest first (undated last), then page and line.
+ * Results without a name search, including date-filtered ones, come back in this order.
+ */
 function compareLedgerOrder(a: Burial, b: Burial): number {
   if (a.burialDate !== b.burialDate) {
     if (a.burialDate === null) return 1;
@@ -57,7 +58,7 @@ export function createMemoryRepository(records: Burial[]): BurialRepository {
   return {
     async search(params: SearchParams): Promise<SearchResult> {
       const query = params.q?.trim() ?? "";
-      const hits: { burial: Burial; match: NameMatch | null }[] = [];
+      const hits: { burial: Burial; match: NameMatch | null; distance: number }[] = [];
 
       for (const burial of burials) {
         if (!inLedgerYears(burial)) continue;
@@ -75,12 +76,13 @@ export function createMemoryRepository(records: Burial[]): BurialRepository {
 
         const match = query ? matchName(burial.nameAsWritten, query) : null;
         if (query && !match) continue;
-        hits.push({ burial, match });
+        hits.push({ burial, match, distance: query ? nameDistance(burial.nameAsWritten, query) : 0 });
       }
 
       if (query) {
-        // Array.sort is stable, so ties keep ledger order.
-        hits.sort((a, b) => MATCH_RANK[a.match!.type] - MATCH_RANK[b.match!.type] || a.match!.score - b.match!.score);
+        // Closest names first. Array.sort is stable, so equally close names stay in ledger
+        // order: earliest burial date first.
+        hits.sort((a, b) => a.distance - b.distance);
       }
 
       const start = (params.page - 1) * params.pageSize;

@@ -223,3 +223,33 @@ describe("records with no ledger page", () => {
     expect(result.items.map((item) => item.sourcePage)).toEqual([6, null]);
   });
 });
+
+describe("result order", () => {
+  it("puts the closest names first, then the earliest dates", async () => {
+    const repository = await loadBurials();
+    const { id: _, ...hattie } = (await repository.getById(10))!;
+    const add = (lineOnPage: number, nameAsWritten: string, burialDate: string) =>
+      repository.create({ ...hattie, lineOnPage, nameAsWritten, burialDate });
+    await add(90, "Mary Talbert", "1905-10-01");
+    await add(91, "Sam Tolbert", "1906-03-01");
+    await add(92, "Ann Tolbirt", "1905-11-01");
+    await add(93, "Joe Tolbert", "1905-09-01");
+    const routes = burialRoutes(repository);
+
+    const result: SearchResult = await (await routes.request("/burials?q=tolbert&pageSize=10")).json();
+    expect(result.items.map((item) => [item.nameAsWritten, item.burialDate])).toEqual([
+      ["Joe Tolbert", "1905-09-01"],
+      ["Hattie Tolbert", "1905-10-12"],
+      ["Sam Tolbert", "1906-03-01"],
+      ["Mary Talbert", "1905-10-01"],
+      ["Ann Tolbirt", "1905-11-01"],
+    ]);
+  });
+
+  it("lists a date range from earliest to latest", async () => {
+    const result = await search("from=1905-10-01&to=1905-10-31&pageSize=100");
+    const dates = result.items.map((item) => item.burialDate!);
+    expect(dates.length).toBeGreaterThan(1);
+    expect(dates).toEqual([...dates].sort());
+  });
+});

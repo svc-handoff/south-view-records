@@ -94,6 +94,29 @@ function matchToken(qt: string, nameTokens: string[]): NameMatch | null {
   return best;
 }
 
+/**
+ * How far a matched name is from the query, for ordering results: lower is closer.
+ * Adds up, for each word of the query, the fewest letter edits to turn it into the start of some
+ * word in the name, so "tolb" is 0 from "Tolbert" and 1 from "Talbert". A name that holds the
+ * whole query as written is 0. Abbreviations count by their letters too ("jno" is 2 from "john").
+ */
+export function nameDistance(name: string, query: string): number {
+  const q = normalize(query);
+  const n = normalize(name);
+  if (n.includes(q)) return 0;
+
+  const nameTokens = tokens(n);
+  let distance = 0;
+  for (const qt of tokens(q)) {
+    let best = Infinity;
+    for (const nt of nameTokens) {
+      best = Math.min(best, editDistance(qt, nt), editDistance(qt, nt.slice(0, qt.length)));
+    }
+    distance += best;
+  }
+  return distance;
+}
+
 function rank(type: MatchType): number {
   return type === "exact" ? 0 : type === "abbreviation" ? 1 : 2;
 }
