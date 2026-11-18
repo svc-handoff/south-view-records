@@ -1,9 +1,12 @@
 import type { ReactNode } from "react";
+import { ArrowRightIcon } from "lucide-react";
 import { Link } from "react-router";
 import ledger from "@/assets/george-wilder-ledger.jpg";
 import transcription from "@/assets/george-wilder-transcription.png";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { formatDate } from "@/lib/format";
+import { METHODS_PATH } from "@/routes/methods";
+import { cn } from "@/lib/utils";
 
 export const HIDDEN_NARRATIVES_PATH = "/hidden-narratives";
 
@@ -45,8 +48,8 @@ export function HiddenNarrativesPage() {
           Hidden Narratives
         </h1>
         <p className="text-lg leading-relaxed">
-          Cemetery ledgers often contain hidden insights that can lead us to better understanding stories and historical
-          events. The dates, locations, and names of individuals buried during certain time periods can provide these
+          Cemetery ledgers often contain hidden insights that can lead to a better understanding of stories and
+          historical events. The dates, locations, and names of individuals buried during certain time periods can provide these
           insights.
         </p>
       </header>
@@ -62,7 +65,7 @@ export function HiddenNarrativesPage() {
           <Cite href={COALITION_URL}>Coalition to Remember</Cite>.
         </p>
         <p className="leading-relaxed">
-          George Wilder was one of the victims. The South-View Records Index project found his name in the ledger and
+          George Wilder was one of the victims <Cite href={COALITION_URL}>Coalition to Remember</Cite>. The South-View Burial Records Index Project found his name in the ledger and
           detailed information below.
         </p>
 
@@ -94,7 +97,7 @@ export function HiddenNarrativesPage() {
             />
           }
         >
-          The highlights show what was hard to read in our automated process, including his name, so a search for a
+          The highlights show what was hard to read in the automated transcription process, including his name, so searches for a
           different or similar spelling will still be picked up.
         </Figure>
       </section>
@@ -104,61 +107,41 @@ export function HiddenNarrativesPage() {
           Additional Records Found
         </h2>
         <p className="leading-relaxed">
-          From the 16 identified victims of the Massacre, we used our record system to find a total of four (George
-          Wilder, Marshall Carter, Milton Brown, Frank Smith). Although Stinson Ferguson is also believed to be buried at
-          South-View, our system did not identify his records (It did find a Hindson Ferguson with the same age buried on
-          9/27/1906, which may be a potential match.) On the Coalition to Remember’s site, George, Marshall, and
-          Frank are all already recorded as being buried at South-View; however, Milton’s record makes note that where he
-          is buried is unknown <Cite href={COALITION_URL}>Coalition to Remember</Cite>. We believe that this project is
-          the first ever indication of Milton Brown’s burial location and age. Without a digitized and searchable index,
-          finding and analyzing these records would have been a very tedious process. It would have involved a manual
-          search over fragile records, while analyzing difficult handwriting. Our automated flow makes this and even more
-          research possible. For example, we found a discrepancy in that George Wilder’s age is recorded as 60 years old in
-          the ledger and 70 years old on the Coalition to Remember site and a similar, even greater discrepancy with
-          Frank’s age being recorded as 76 in the ledger and 19 on the site. These discrepancies provide additional areas
-          for researchers to uncover the truth and stories behind these victims.
+          From the 16 identified victims of the Massacre, the record system identified a total of four buried at
+          South-View (George Wilder, Marshall Carter, Milton Brown, Frank Smith). Although Stinson Ferguson is also
+          believed to be buried at South-View <Cite href={ROJAS_URL}>Rojas</Cite>, the system did not identify his records (It did find a Hindson Ferguson with
+          the same age buried on September 27, 1906, which may be a potential match.) On the Coalition to Remember’s site, Wilder,
+          Carter, and Smith are all already recorded as being buried at South-View; however, Brown’s record makes note
+          that where he is buried is unknown <Cite href={COALITION_URL}>Coalition to Remember</Cite>.
         </p>
 
-        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <ul className="flex flex-wrap justify-center gap-4 py-2">
           {FOUND.map((person) => (
-            <li key={person.name} className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4">
-              <div className="flex flex-col gap-0.5">
-                <h3 className="flex flex-wrap items-center gap-2 font-heading text-lg font-semibold text-foreground">
-                  {person.name}
-                  {"possible" in person ? (
-                    <span className="rounded-full border border-border px-2 py-0.5 font-sans text-xs font-medium text-muted-foreground">
-                      Possible match
-                    </span>
-                  ) : null}
-                </h3>
-                <p className="text-sm text-muted-foreground">Written in the ledger as “{person.asWritten}”</p>
-              </div>
-              <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
-                <dt className="text-muted-foreground">Buried</dt>
-                <dd>{formatDate(person.buried)}</dd>
-                <dt className="text-muted-foreground">Age</dt>
-                <dd>{person.age} years</dd>
-                <dt className="text-muted-foreground">Ledger</dt>
-                <dd>Page 31, line {person.line}</dd>
-              </dl>
-              <Link to={recordSearch(person.asWritten, person.buried)} className={`${linkClass} text-sm`}>
-                See the record for “{person.asWritten}”
-              </Link>
-            </li>
+            <FoundCard key={person.name} person={person} />
           ))}
         </ul>
+
+        <p className="leading-relaxed">
+          This project is a possible first ever indication of Brown’s burial location and age. Without a digitized
+          and searchable index, finding and analyzing these records would have been a very tedious process. It would have
+          involved a manual search over fragile records, while analyzing difficult handwriting. The system’s automated flow makes
+          this and even more research possible. For example, it found a discrepancy in that Wilder’s age is recorded
+          as 60 years old in the ledger and 70 years old on the Coalition to Remember site and a similar, even greater
+          discrepancy with Smith’s age being recorded as 76 in the ledger and 19 on the site <Cite href={COALITION_URL}>Coalition to Remember</Cite>. These discrepancies provide
+          additional areas for researchers to uncover the truth and stories behind these victims.
+        </p>
       </section>
 
       <section aria-labelledby="hidden-narratives" className="flex flex-col gap-4">
         <h2 id="hidden-narratives" className="font-heading text-2xl font-semibold text-foreground">
-          Hidden Narratives
+          Hidden Narratives Found
         </h2>
         <p className="leading-relaxed">
-          The South-View Burial Records Index provides a unique insight into the African-American community of the early
+          The South-View Burial Records Index Project provides a unique insight into the African American community of the early
           1900s in Atlanta. Many of those buried at South-View, especially the poorer, were buried in unmarked graves{" "}
           <Cite href={ROJAS_URL}>Rojas</Cite>. But by providing this interface to the public, the hidden become more
-          visible. For example, in the NY Times article, Marshall Carter was said to be buried in an unmarked grave, but
-          our records provide a location. These hidden narratives now come through, a history that was once buried in
+          visible. For example, in The New York Times article, Carter was said to be buried in an unmarked grave, but
+          the system’s records provide a location <Cite href={ROJAS_URL}>Rojas</Cite>. These hidden narratives now come through, a history that was once buried in
           books and ink is now accessible and at the fingertips of all.
         </p>
       </section>
@@ -185,6 +168,15 @@ export function HiddenNarrativesPage() {
         </Link>
       </p>
 
+      <p className="text-sm leading-relaxed text-muted-foreground">
+        All burial records are courtesy of South-View’s handwritten ledgers, and scanned by the Georgia Tech Library.
+        Transcription process is documented in{" "}
+        <Link to={METHODS_PATH} className={linkClass}>
+          methods
+        </Link>
+        .
+      </p>
+
       <section aria-labelledby="sources" className="flex flex-col gap-3 border-t border-border pt-6">
         <h2 id="sources" className="font-heading text-xl font-semibold text-foreground">
           Sources
@@ -206,6 +198,54 @@ export function HiddenNarrativesPage() {
         </ul>
       </section>
     </article>
+  );
+}
+
+/** One person found in the ledger: where they appear, the name as the clerk wrote it, and the key details. */
+function FoundCard({ person }: { person: (typeof FOUND)[number] }) {
+  const possible = "possible" in person;
+  return (
+    <li
+      className={cn(
+        "relative flex w-full flex-col overflow-hidden rounded-2xl border bg-card shadow-sm sm:w-[calc(50%-0.5rem)]",
+        possible ? "border-dashed border-gold-ink/60" : "border-border",
+      )}
+    >
+      <div aria-hidden="true" className={cn("h-1", possible ? "bg-gold-ink/40" : "bg-gold-ink")} />
+      <div className="flex flex-1 flex-col gap-4 p-5">
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-xs font-medium tracking-wider text-gold-ink uppercase">
+            Page 31 · Line {person.line}
+          </span>
+          {possible ? (
+            <span className="rounded-full border border-gold-ink/50 px-2 py-0.5 text-xs font-medium text-gold-ink">
+              Possible match
+            </span>
+          ) : null}
+        </div>
+        <div className="flex flex-col gap-1">
+          <h3 className="font-heading text-xl font-semibold text-foreground">{person.name}</h3>
+          <p className="font-heading text-muted-foreground italic">Written as “{person.asWritten}”</p>
+        </div>
+        <dl className="grid grid-cols-[3fr_2fr] divide-x divide-border border-y border-border py-3">
+          <div className="flex flex-col gap-0.5 pr-3">
+            <dt className="text-xs text-muted-foreground uppercase tracking-wider">Buried</dt>
+            <dd className="font-medium whitespace-nowrap">{formatDate(person.buried)}</dd>
+          </div>
+          <div className="flex flex-col gap-0.5 pl-3">
+            <dt className="text-xs text-muted-foreground uppercase tracking-wider">Age</dt>
+            <dd className="font-medium">{person.age} years</dd>
+          </div>
+        </dl>
+        <Link
+          to={recordSearch(person.asWritten, person.buried)}
+          className="group mt-auto inline-flex items-center gap-1.5 self-start rounded-sm text-sm font-medium text-foreground outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+        >
+          <span className="underline underline-offset-4">See the record for “{person.asWritten}”</span>
+          <ArrowRightIcon aria-hidden="true" className="size-4 transition-transform group-hover:translate-x-0.5" />
+        </Link>
+      </div>
+    </li>
   );
 }
 
